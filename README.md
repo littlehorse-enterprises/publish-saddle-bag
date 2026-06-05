@@ -1,6 +1,6 @@
 # publish-saddle-bag
 
-A GitHub Actions composite action that builds a Quarkus Slack Saddle Bag with Gradle,
+A GitHub Actions composite action that builds a Quarkus Saddle Bag with Gradle,
 reads OCI annotations from the resulting properties file, and publishes the Docker image
 to a container registry.
 
@@ -9,17 +9,31 @@ to a container registry.
 ## Usage
 
 ```yaml
+name: Deploy My Saddle Bag
+
+on:
+  push:
+    branches:
+      - main
+
 permissions:
   contents: read
   packages: write
 
-- name: Publish Saddle Bag
-  uses: littlehorse-enterprises/publish-saddle-bag@v1
-  with:
-    registry: ghcr.io
-    username: ${{ github.actor }}
-    password: ${{ secrets.GITHUB_TOKEN }}
-    images: ghcr.io/${{ github.repository }}/slack-saddle-bag
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Publish Saddle Bag
+        uses: littlehorse-enterprises/publish-saddle-bag@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          images: ghcr.io/${{ github.repository }}/my-saddle-bag
 ```
 
 ## Inputs
@@ -56,14 +70,14 @@ permissions:
     registry: ghcr.io
     username: ${{ github.actor }}
     password: ${{ secrets.GITHUB_TOKEN }}
-    images: ghcr.io/${{ github.repository }}/slack-saddle-bag
-    context: bags/slack
-    dockerfile: bags/slack/src/main/docker/Dockerfile.jvm
+    images: ghcr.io/${{ github.repository }}/my-saddle-bag
+    context: bags/my-saddle-bag
+    dockerfile: bags/my-saddle-bag/src/main/docker/Dockerfile.jvm
     tags: |
       type=semver,pattern={{version}}
       type=ref,event=branch
     labels: |
-      org.opencontainers.image.vendor=LittleHorse Enterprises
+      org.opencontainers.image.vendor=My Vendor
     annotations: |
       com.example.custom=value
     docker-build-args: |
