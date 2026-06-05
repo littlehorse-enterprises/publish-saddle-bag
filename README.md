@@ -4,6 +4,8 @@ A GitHub Actions composite action that builds a Quarkus Slack Saddle Bag with Gr
 reads OCI annotations from the resulting properties file, and publishes the Docker image
 to a container registry.
 
+> **Note:** Only Java-based Quarkus Docker images are supported. Native Quarkus images are not supported yet.
+
 ## Usage
 
 ```yaml
