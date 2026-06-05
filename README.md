@@ -7,6 +7,10 @@ to a container registry.
 ## Usage
 
 ```yaml
+permissions:
+  contents: read
+  packages: write
+
 - name: Publish Saddle Bag
   uses: littlehorse-enterprises/publish-saddle-bag@v1
   with:
