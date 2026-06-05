@@ -73,7 +73,13 @@ runs:
     - name: Build Slack Saddle Bag
       shell: bash
       working-directory: ${{ inputs.working-directory }}
-      run: gradle build -Dquarkus.littlehorse.saddle.bag.output.format=properties -Dquarkus.littlehorse.saddle.bag.output.enable=true ${{ inputs.quarkus-build-args }}
+      run: >
+        gradle build
+        -Dquarkus.littlehorse.saddle.bag.output.format=properties
+        -Dquarkus.littlehorse.saddle.bag.output.enable=true
+        -Dquarkus.littlehorse.saddle.bag.output.path=saddle-bag/
+        -Dquarkus.littlehorse.saddle.bag.output.filename=saddle-bag
+        ${{ inputs.quarkus-build-args }}
 
     - name: Login to Registry
       uses: docker/login-action@v4
