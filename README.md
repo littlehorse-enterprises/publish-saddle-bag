@@ -29,7 +29,8 @@ to a container registry.
 | `tags` | ❌ | `''` | Tag patterns passed to `docker/metadata-action` (one per line) |
 | `labels` | ❌ | `''` | Extra labels passed to `docker/metadata-action` (`KEY=VALUE`, one per line) |
 | `annotations` | ❌ | `''` | Extra annotations passed to `docker/metadata-action` (`[TYPE:]KEY=VALUE`, one per line) |
-| `build-args` | ❌ | `''` | Docker build arguments (`NAME=VALUE`, one per line) |
+| `docker-build-args` | ❌ | `''` | Docker build arguments (`NAME=VALUE`, one per line) |
+| `quarkus-build-args` | ❌ | `''` | Quarkus build arguments (space-separated, e.g. `-Dkey=value`) |
 
 ## Outputs
 
@@ -38,17 +39,6 @@ to a container registry.
 | `tags` | Docker image tags produced by the build |
 | `digest` | Docker image digest |
 | `metadata` | Build result metadata (JSON) |
-
-## Steps performed
-
-1. **Checkout** – checks out the calling repository.
-2. **Set up JDK 25** – installs Temurin JDK 25 via `actions/setup-java`.
-3. **Set up Docker Buildx** – configures an extended Docker builder.
-4. **Build Slack Saddle Bag** – runs `gradle build -Dquarkus.littlehorse.saddle.bag.output.format=properties`.
-5. **Login to Registry** – authenticates against the target registry.
-6. **Read OCI annotations** – reads `bags/slack/build/saddle-bag/saddle-bag.properties` and emits every property prefixed with `io.littlehorse.saddle.bag.` as OCI annotations.
-7. **Extract metadata** – runs `docker/metadata-action` to generate tags, labels, and annotations from Git context plus any extra inputs.
-8. **Build and push** – builds the Docker image and pushes it with the generated tags, labels, and the merged set of annotations (metadata + OCI properties + user-supplied).
 
 ## Extended example
 
@@ -68,7 +58,8 @@ to a container registry.
     labels: |
       org.opencontainers.image.vendor=LittleHorse Enterprises
     annotations: |
-      manifest:com.example.custom=value
-    build-args: |
+      com.example.custom=value
+    docker-build-args: |
       APP_VERSION=${{ github.ref_name }}
+    quarkus-build-args: -Dquarkus.profile=prod
 ```
