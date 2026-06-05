@@ -28,8 +28,9 @@ permissions:
 | `username` | ✅ | — | Registry username |
 | `password` | ✅ | — | Registry password or token |
 | `images` | ✅ | — | Image name(s) passed to `docker/metadata-action` (one per line) |
-| `context` | ❌ | `.` | Docker build context path |
-| `file` | ❌ | `{context}/Dockerfile` | Path to the Dockerfile |
+| `working-directory` | ❌ | `.` | Directory where the Gradle build is executed |
+| `context` | ❌ | `working-directory` | Docker build context path (defaults to `working-directory`) |
+| `dockerfile` | ❌ | `''` | Path to the Dockerfile (defaults to `working-directory/Dockerfile`) |
 | `tags` | ❌ | `''` | Tag patterns passed to `docker/metadata-action` (one per line) |
 | `labels` | ❌ | `''` | Extra labels passed to `docker/metadata-action` (`KEY=VALUE`, one per line) |
 | `annotations` | ❌ | `''` | Extra annotations passed to `docker/metadata-action` (`[TYPE:]KEY=VALUE`, one per line) |
@@ -55,7 +56,7 @@ permissions:
     password: ${{ secrets.GITHUB_TOKEN }}
     images: ghcr.io/${{ github.repository }}/slack-saddle-bag
     context: bags/slack
-    file: bags/slack/src/main/docker/Dockerfile.jvm
+    dockerfile: bags/slack/src/main/docker/Dockerfile.jvm
     tags: |
       type=semver,pattern={{version}}
       type=ref,event=branch
