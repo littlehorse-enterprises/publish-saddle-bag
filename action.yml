@@ -46,6 +46,10 @@ inputs:
     description: "Quarkus build arguments (space-separated, e.g. -Dkey=value)"
     required: false
     default: ""
+  platforms:
+    description: "Architecture platforms"
+    required: false
+    default: "linux/amd64,linux/arm64"
 
 outputs:
   tags:
@@ -126,3 +130,17 @@ runs:
         labels: ${{ steps.meta.outputs.labels }}
         annotations: ${{ steps.meta.outputs.annotations }}
         build-args: ${{ inputs.docker-build-args }}
+        platforms: ${{ inputs.platforms }}
+
+    - name: Write published image summary
+      shell: bash
+      run: |
+        {
+          echo "## Published Docker Image Tags"
+          echo
+          echo "The following tags were pushed:"
+          echo
+          while IFS= read -r tag; do
+            [ -n "$tag" ] && echo "- \`$tag\`"
+          done <<< "${{ steps.meta.outputs.tags }}"
+        } >> "$GITHUB_STEP_SUMMARY"
