@@ -52,6 +52,7 @@ jobs:
 | `annotations` | ❌ | `''` | Extra annotations passed to `docker/metadata-action` (`[TYPE:]KEY=VALUE`, one per line) |
 | `docker-build-args` | ❌ | `''` | Docker build arguments (`NAME=VALUE`, one per line) |
 | `quarkus-build-args` | ❌ | `''` | Quarkus build arguments (space-separated, e.g. `-Dkey=value`) |
+| `platforms` | ❌ | `linux/amd64,linux/arm64` | Architecture platforms |
 
 ## Outputs
 
@@ -83,4 +84,5 @@ jobs:
     docker-build-args: |
       APP_VERSION=${{ github.ref_name }}
     quarkus-build-args: -Dquarkus.profile=prod
+    platforms: linux/amd64,linux/arm64
 ```
