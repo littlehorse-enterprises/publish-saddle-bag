@@ -14,6 +14,14 @@ inputs:
   images:
     description: "Image name(s) passed to docker/metadata-action (one per line)"
     required: true
+  version:
+    description: "Saddle bag version (overrides quarkus.application.version)"
+    required: false
+    default: ${{ github.ref_name }}
+  prerelease:
+    description: "Whether this is a prerelease (disables the 'latest' tag when 'true')"
+    required: false
+    default: "false"
   working-directory:
     description: "Directory where the Gradle build is executed"
     required: false
@@ -77,13 +85,18 @@ runs:
     - name: Build Slack Saddle Bag
       shell: bash
       working-directory: ${{ inputs.working-directory }}
-      run: >
-        gradle build
-        -Dquarkus.littlehorse.saddle.bag.output.format=properties
-        -Dquarkus.littlehorse.saddle.bag.output.enable=true
-        -Dquarkus.littlehorse.saddle.bag.output.path=saddle-bag/
-        -Dquarkus.littlehorse.saddle.bag.output.filename=saddle-bag
-        ${{ inputs.quarkus-build-args }}
+      env:
+        IMAGES: ${{ inputs.images }}
+      run: |
+        docker_image="$(printf '%s\n' "$IMAGES" | head -n 1)"
+        gradle build \
+          -Dquarkus.application.version="${{ inputs.version }}" \
+          -Dquarkus.littlehorse.saddle.bag.output.format=properties \
+          -Dquarkus.littlehorse.saddle.bag.output.enable=true \
+          -Dquarkus.littlehorse.saddle.bag.output.path=saddle-bag/ \
+          -Dquarkus.littlehorse.saddle.bag.output.filename=saddle-bag \
+          -Dquarkus.littlehorse.saddle.bag.metadata.docker-image="$docker_image" \
+          ${{ inputs.quarkus-build-args }}
 
     - name: Login to Registry
       uses: docker/login-action@v4
@@ -109,7 +122,10 @@ runs:
       uses: docker/metadata-action@v6
       with:
         images: ${{ inputs.images }}
-        tags: ${{ inputs.tags }}
+        tags: |
+          type=raw,value=latest,enable=${{ inputs.prerelease == 'false' }}
+          type=raw,value=${{ inputs.version }},enable=true
+          ${{ inputs.tags }}
         labels: |
           ${{ inputs.labels }}
           ${{ steps.oci.outputs.annotations }}
