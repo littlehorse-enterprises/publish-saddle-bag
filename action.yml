@@ -89,14 +89,37 @@ runs:
         IMAGES: ${{ inputs.images }}
       run: |
         docker_image="$(printf '%s\n' "$IMAGES" | head -n 1)"
-        gradle build \
-          -Dquarkus.application.version="${{ inputs.version }}" \
-          -Dquarkus.littlehorse.saddle.bag.output.format=properties \
-          -Dquarkus.littlehorse.saddle.bag.output.enable=true \
-          -Dquarkus.littlehorse.saddle.bag.output.path=saddle-bag/ \
-          -Dquarkus.littlehorse.saddle.bag.output.filename=saddle-bag \
-          -Dquarkus.littlehorse.saddle.bag.metadata.docker-image="$docker_image" \
-          ${{ inputs.quarkus-build-args }}
+        for format in properties yaml json; do
+          gradle build \
+            -Dquarkus.application.version="${{ inputs.version }}" \
+            -Dquarkus.littlehorse.saddle.bag.output.format="$format" \
+            -Dquarkus.littlehorse.saddle.bag.output.enable=true \
+            -Dquarkus.littlehorse.saddle.bag.output.path=saddle-bag/ \
+            -Dquarkus.littlehorse.saddle.bag.output.filename=saddle-bag \
+            -Dquarkus.littlehorse.saddle.bag.metadata.docker-image="$docker_image" \
+            ${{ inputs.quarkus-build-args }}
+        done
+
+    - name: Print Saddle Bag output
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        for format in properties yaml json; do
+          file="build/saddle-bag/saddle-bag.$format"
+          echo "===== $file ====="
+          cat "$file"
+          echo
+        done
+
+    - name: Upload Saddle Bag artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: saddle-bag
+        if-no-files-found: error
+        path: |
+          ${{ inputs.working-directory }}/build/saddle-bag/saddle-bag.properties
+          ${{ inputs.working-directory }}/build/saddle-bag/saddle-bag.yaml
+          ${{ inputs.working-directory }}/build/saddle-bag/saddle-bag.json
 
     - name: Login to Registry
       uses: docker/login-action@v4
