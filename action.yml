@@ -121,10 +121,19 @@ runs:
           echo
         done
 
+    - name: Resolve artifact name
+      id: artifact
+      shell: bash
+      env:
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+      run: |
+        project="$(basename "$(cd "$WORKING_DIRECTORY" && pwd)")"
+        echo "name=saddle-bag-spec-${project}" >> "$GITHUB_OUTPUT"
+
     - name: Upload Saddle Bag artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: saddle-bag
+        name: ${{ steps.artifact.outputs.name }}
         if-no-files-found: error
         path: |
           ${{ inputs.working-directory }}/build/saddle-bag/saddle-bag.properties
