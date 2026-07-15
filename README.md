@@ -68,7 +68,8 @@ jobs:
 ## Artifacts
 
 The action generates the saddle-bag manifest in all three formats and uploads them
-as a workflow artifact named `saddle-bag`, downloadable from the run's summary page:
+as a workflow artifact named `saddle-bag-spec-<project>`, where `<project>` is the
+folder name of the `working-directory` input. It is downloadable from the run's summary page:
 
 - `saddle-bag.properties`
 - `saddle-bag.yaml`
