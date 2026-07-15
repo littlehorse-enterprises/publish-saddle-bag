@@ -85,6 +85,15 @@ runs:
     - name: Build Slack Saddle Bag
       shell: bash
       working-directory: ${{ inputs.working-directory }}
+      run: |
+        gradle build \
+          -Dquarkus.application.version="${{ inputs.version }}" \
+          -Dquarkus.littlehorse.saddle.bag.output.enable=false \
+          ${{ inputs.quarkus-build-args }}
+
+    - name: Generate Saddle Bag files
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
       env:
         IMAGES: ${{ inputs.images }}
       run: |
@@ -97,6 +106,7 @@ runs:
             -Dquarkus.littlehorse.saddle.bag.output.path=saddle-bag/ \
             -Dquarkus.littlehorse.saddle.bag.output.filename=saddle-bag \
             -Dquarkus.littlehorse.saddle.bag.metadata.docker-image="$docker_image" \
+            -x test -x check -x spotlessCheck \
             ${{ inputs.quarkus-build-args }}
         done
 
